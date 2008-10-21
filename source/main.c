@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 		(void*)stones_Pal);	// Palette name
 
 	size_t i;
-	for (i = 0; i < 41; ++i)
+	for (i = 0; i < 48; ++i)
 	{
 		s16 x = (i % 8) * 32;
 		s16 y = (i / 8) * 32;
