@@ -48,6 +48,8 @@ private:
 	};
 	
 	Place m_places[8*6];
+	Place m_selection[3];
+	
 	std::stack<u8> m_availableSprites;
 	
 	bool m_isSuspending;
@@ -56,9 +58,15 @@ private:
 	u8 getRandomStone();
 	u8 createSprite(u8 stoneId, u8 x, u8 y);
 	void destroySprite(u8 spriteId);
+	void setSpriteSelected(u8 spriteId, bool selected);
 	
 	void showPlayfield();
 	void hidePlayfield();
+	
+	bool isSelected(const Place& place) const;
+	void setSelected(const Place& place);
+	void setUnselected(const Place& place);
+	u8 getNumSelected() const;
 };
 
 #endif
