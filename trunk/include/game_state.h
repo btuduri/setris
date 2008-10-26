@@ -21,47 +21,32 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef __GAME_STATE_H__
+#define __GAME_STATE_H__
+
 #include <PA9.h>
-#include <stdio.h>
-#include <string.h>
 
-#include "game_loop.h"
-
-#include "stones_data.cpp"
-
-static const unsigned short NUM_TILES = 81;
-
-// Function: main()
-int main(int argc, char ** argv)
+class GameState
 {
+public:
+	static const u8 STATE_RESUMING = 1;
+	static const u8 STATE_RUNNING = 2;
+	static const u8 STATE_SUSPENDING = 3;
+	static const u8 STATE_DONE = 4;
 	
-	// PA_LoadSpritePal(0, // Screen
-		// 0, // Palette number
-		// (void*)stones_Pal);	// Palette name
+	GameState() {};
+	virtual ~GameState() {};
+	
+	virtual void resume() = 0;
+	virtual void suspend() = 0;
 
-	// size_t i;
-	// for (i = 0; i < 48; ++i)
-	// {
-		// s16 x = (i % 8) * 32;
-		// s16 y = (i / 8) * 32;
-								
-		// PA_CreateSprite(0, // Screen
-				// i, // Sprite number
-				// (void*)(stones_Sprites + i*32*32), // Sprite data
-				// OBJ_SIZE_32X32, // Sprite size
-				// 1, // 256 color mode
-				// 0, // Sprite palette number
-				// x, y); // X and Y position on the screen
-	// }
-		
-	// // Infinite loop to keep the program running
-	// while (1)
-	// {
-		// PA_WaitForVBL();
-	// }
+	/**
+	 * Advances this state. Called every frame that this state is active.
+	 * @return the internal state of this game state.
+	 */
+	virtual u8 run() = 0;
 	
-	GameLoop game;
-	game.run();
-	
-	return 0;
-}
+	virtual u8 getId() = 0;
+};
+
+#endif

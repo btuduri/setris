@@ -21,47 +21,35 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#ifndef __GAME_LOOP_H__
+#define __GAME_LOOP_H__
+
 #include <PA9.h>
-#include <stdio.h>
-#include <string.h>
+#include <stack>
 
-#include "game_loop.h"
+class GameState;
 
-#include "stones_data.cpp"
-
-static const unsigned short NUM_TILES = 81;
-
-// Function: main()
-int main(int argc, char ** argv)
+class GameLoop
 {
+public:
+	GameLoop();
+	~GameLoop();
 	
-	// PA_LoadSpritePal(0, // Screen
-		// 0, // Palette number
-		// (void*)stones_Pal);	// Palette name
+	void run();
+	
+	/// Suspends current state and starts the given state.
+	void pushState(u8 stateId);
+	/// Suspends and destroys current state and resumes the one below
+	void popState();
+	/// This will destroy all states on the stack and start given state.
+	void setState(u8 stateId);
+private:
+	std::stack<GameState*> m_states;
+	/// If not NULL, then this will be pushed on the stack, after current
+	/// state is done.
+	GameState* m_nextState;
+	
+	GameState* createState(u8 stateId);
+};
 
-	// size_t i;
-	// for (i = 0; i < 48; ++i)
-	// {
-		// s16 x = (i % 8) * 32;
-		// s16 y = (i / 8) * 32;
-								
-		// PA_CreateSprite(0, // Screen
-				// i, // Sprite number
-				// (void*)(stones_Sprites + i*32*32), // Sprite data
-				// OBJ_SIZE_32X32, // Sprite size
-				// 1, // 256 color mode
-				// 0, // Sprite palette number
-				// x, y); // X and Y position on the screen
-	// }
-		
-	// // Infinite loop to keep the program running
-	// while (1)
-	// {
-		// PA_WaitForVBL();
-	// }
-	
-	GameLoop game;
-	game.run();
-	
-	return 0;
-}
+#endif
