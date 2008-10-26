@@ -29,6 +29,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 class GameState
 {
 public:
+	static const u8 ID_MENU = 1;
+	static const u8 ID_PLAY = 2;
+	static const u8 ID_PAUSE = 3;
+	static const u8 ID_HIGHSCORE = 4;
+
 	static const u8 STATE_RESUMING = 1;
 	static const u8 STATE_RUNNING = 2;
 	static const u8 STATE_SUSPENDING = 3;

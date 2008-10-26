@@ -24,6 +24,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "menu_game_state.h"
 
 #include "menu_music.h"
+#include "game_loop.h"
 
 MenuGameState::MenuGameState()
 	: m_selectedOption(START_GAME_OPTION), m_isSuspending(false)
@@ -54,6 +55,10 @@ void MenuGameState::resume()
 void MenuGameState::suspend()
 {
 	PA_StopMod();
+	
+	// Clear screen
+	PA_OutputSimpleText(0, 9, 10, "            ");
+	PA_OutputSimpleText(0, 9, 12, "            ");
 	
 	m_isSuspending = true;
 }
@@ -100,6 +105,14 @@ u8 MenuGameState::run()
 	if (stylusHit || Pad.Newpress.A)
 	{
 		// Start selected game state.
+		if (m_selectedOption == START_GAME_OPTION)
+		{
+			GameLoop::getInstance()->pushState(ID_PLAY);
+		}
+		else if (m_selectedOption == SHOW_HIGHSCORE_OPTION)
+		{
+			GameLoop::getInstance()->pushState(ID_HIGHSCORE);
+		}
 	}
 	
 	return m_isSuspending ? STATE_DONE : STATE_RUNNING;
@@ -107,5 +120,5 @@ u8 MenuGameState::run()
 
 u8 MenuGameState::getId()
 {
-	return 1;
+	return ID_MENU;
 }
