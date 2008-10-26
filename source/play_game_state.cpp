@@ -33,10 +33,17 @@ PlayGameState::PlayGameState()
 		0, // Palette number
 		(void*)stones_Pal);	// Palette name
 		
+	PA_SetRotset(0, 1, 0, 128, 128);
+		
 	initPlayField();
 	for (u8 i = 0; i < 128; ++i)
 	{
 		m_availableSprites.push(i);
+	}
+	
+	for (u8 i = 0; i < 3; ++i)
+	{
+		m_selection[i].spriteId = 255;
 	}
 }
 
@@ -64,8 +71,41 @@ void PlayGameState::suspend()
 }
 
 u8 PlayGameState::run()
-{	
-	return m_isSuspending ? STATE_DONE : STATE_RUNNING;
+{
+	if (m_isSuspending)
+	{
+		return STATE_DONE;
+	}
+	
+	if (Stylus.Newpress)
+	{
+		u8 x = Stylus.X % 32;
+		u8 y = Stylus.Y % 32;
+		
+		if (m_places[y*8+x].spriteId != 255)
+		{
+			// Player hit a sprite with the stylus.
+			// is the place already selected?
+			if (isSelected(m_places[y*8+x]))
+			{
+				// Yep, already selected, so deselect now.
+				setUnselected(m_places[y*8+x]);
+			}
+			else
+			{
+				// Nope, not yet selected, so select now.
+				setSelected(m_places[y*8+x]);
+			}
+			
+			// Do we have three pieces selected now?
+			if (getNumSelected() == 3)
+			{
+				///@todo check if we have a set.
+			}
+		}
+	}
+	
+	return STATE_RUNNING;
 }
 
 u8 PlayGameState::getId()
@@ -112,6 +152,7 @@ u8 PlayGameState::createSprite(u8 stoneId, u8 x, u8 y)
 		1, // 256 color mode
 		0, // Sprite palette number
 		x*32, y*32); // X and Y position on the screen
+	//PA_SetSpritePrio(0, id, 10);
 
 	return id;
 }
@@ -120,6 +161,19 @@ void PlayGameState::destroySprite(u8 spriteId)
 {
 	PA_DeleteSprite(0, spriteId);
 	m_availableSprites.push(spriteId);
+}
+
+void PlayGameState::setSpriteSelected(u8 spriteId, bool selected)
+{
+	PA_SetSpritePrio(0, spriteId, selected ? 1 : 10);
+	if (selected)
+	{
+		PA_SetSpriteRotEnable(0, spriteId, 1);
+	}
+	else
+	{
+		PA_SetSpriteRotDisable(0, spriteId);
+	}
 }
 
 void PlayGameState::showPlayfield()
@@ -142,4 +196,52 @@ void PlayGameState::hidePlayfield()
 			destroySprite(m_places[i].spriteId);
 		}
 	}
+}
+
+bool PlayGameState::isSelected(const Place& place) const
+{
+	return m_selection[0].spriteId == place.spriteId ||
+		   m_selection[1].spriteId == place.spriteId ||
+		   m_selection[2].spriteId == place.spriteId;
+}
+
+void PlayGameState::setSelected(const Place& place)
+{
+	for (u8 i = 0; i < 3; ++i)
+	{
+		if (m_selection[i].spriteId == 255)
+		{
+			m_selection[i].spriteId = place.spriteId;
+			setSpriteSelected(place.spriteId, true);
+			break;
+		}
+	}
+}
+
+void PlayGameState::setUnselected(const Place& place)
+{
+	for (u8 i = 0; i < 3; ++i)
+	{
+		if (m_selection[i].spriteId == place.spriteId)
+		{
+			m_selection[i].spriteId = 255;
+			setSpriteSelected(place.spriteId, false);
+			break;
+		}
+	}
+}
+
+u8 PlayGameState::getNumSelected() const
+{
+	u8 rval = 0;
+	
+	for (u8 i = 0; i < 3; ++i)
+	{
+		if (m_selection[i].spriteId == 255)
+		{
+			++rval;
+		}
+	}
+	
+	return rval;
 }
