@@ -21,47 +21,28 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <PA9.h>
-#include <stdio.h>
-#include <string.h>
+#ifndef __MENU_GAME_STATE_H__
+#define __MENU_GAME_STATE_H__
 
-#include "game_loop.h"
+#include "game_state.h"
 
-#include "stones_data.cpp"
-
-static const unsigned short NUM_TILES = 81;
-
-// Function: main()
-int main(int argc, char ** argv)
+class MenuGameState : public GameState
 {
+public:
+	MenuGameState();
+	virtual ~MenuGameState();
 	
-	// PA_LoadSpritePal(0, // Screen
-		// 0, // Palette number
-		// (void*)stones_Pal);	// Palette name
+	virtual void resume();
+	virtual void suspend();
 
-	// size_t i;
-	// for (i = 0; i < 48; ++i)
-	// {
-		// s16 x = (i % 8) * 32;
-		// s16 y = (i / 8) * 32;
-								
-		// PA_CreateSprite(0, // Screen
-				// i, // Sprite number
-				// (void*)(stones_Sprites + i*32*32), // Sprite data
-				// OBJ_SIZE_32X32, // Sprite size
-				// 1, // 256 color mode
-				// 0, // Sprite palette number
-				// x, y); // X and Y position on the screen
-	// }
-		
-	// // Infinite loop to keep the program running
-	// while (1)
-	// {
-		// PA_WaitForVBL();
-	// }
+	virtual u8 run();
 	
-	GameLoop game;
-	game.run();
+	virtual u8 getId();
+private:
+	static const u8 START_GAME_OPTION = 0;
+	static const u8 SHOW_HIGHSCORE_OPTION = 1;
 	
-	return 0;
-}
+	u8 m_selectedOption;
+};
+
+#endif

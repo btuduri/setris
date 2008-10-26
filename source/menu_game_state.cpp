@@ -21,47 +21,40 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <PA9.h>
-#include <stdio.h>
-#include <string.h>
+#include "menu_game_state.h"
 
-#include "game_loop.h"
+#include "music.h"
 
-#include "stones_data.cpp"
-
-static const unsigned short NUM_TILES = 81;
-
-// Function: main()
-int main(int argc, char ** argv)
+MenuGameState::MenuGameState() : m_selectedOption(START_GAME_OPTION)
 {
-	
-	// PA_LoadSpritePal(0, // Screen
-		// 0, // Palette number
-		// (void*)stones_Pal);	// Palette name
+}
 
-	// size_t i;
-	// for (i = 0; i < 48; ++i)
-	// {
-		// s16 x = (i % 8) * 32;
-		// s16 y = (i / 8) * 32;
-								
-		// PA_CreateSprite(0, // Screen
-				// i, // Sprite number
-				// (void*)(stones_Sprites + i*32*32), // Sprite data
-				// OBJ_SIZE_32X32, // Sprite size
-				// 1, // 256 color mode
-				// 0, // Sprite palette number
-				// x, y); // X and Y position on the screen
-	// }
-		
-	// // Infinite loop to keep the program running
-	// while (1)
-	// {
-		// PA_WaitForVBL();
-	// }
+MenuGameState::~MenuGameState()
+{
+}
 	
-	GameLoop game;
-	game.run();
+void MenuGameState::resume()
+{
+	PA_PlayMod(music);
+}
+
+void MenuGameState::suspend()
+{
+}
+
+u8 MenuGameState::run()
+{
+	// handle input.
+	// up / down to change options.
+	// Button A to start currently selected option.
 	
-	return 0;
+	// Stylus control is possible too.
+	// Start item pointed at.
+	
+	return STATE_RUNNING;
+}
+
+u8 MenuGameState::getId()
+{
+	return 1;
 }
