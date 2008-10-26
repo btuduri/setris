@@ -21,39 +21,25 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __GAME_LOOP_H__
-#define __GAME_LOOP_H__
+#ifndef __PAUSE_GAME_STATE_H__
+#define __PAUSE_GAME_STATE_H__
 
-#include <PA9.h>
-#include <stack>
+#include "game_state.h"
 
-class GameState;
-
-class GameLoop
+class PauseGameState : public GameState
 {
 public:
-	GameLoop();
-	~GameLoop();
+	PauseGameState();
+	virtual ~PauseGameState();
 	
-	static GameLoop* getInstance();
+	virtual void resume();
+	virtual void suspend();
+
+	virtual u8 run();
 	
-	void run();
-	
-	/// Suspends current state and starts the given state.
-	void pushState(u8 stateId);
-	/// Suspends and destroys current state and resumes the one below
-	void popState();
-	/// This will destroy all states on the stack and start given state.
-	void setState(u8 stateId);
+	virtual u8 getId();
 private:
-	static GameLoop* ms_instance;
-	
-	std::stack<GameState*> m_states;
-	/// If not NULL, then this will be pushed on the stack, after current
-	/// state is done.
-	GameState* m_nextState;
-	
-	GameState* createState(u8 stateId);
+	bool m_isSuspending;
 };
 
 #endif

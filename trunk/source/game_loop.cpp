@@ -25,6 +25,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "game_state.h"
 #include "menu_game_state.h"
+#include "play_game_state.h"
+#include "highscore_game_state.h"
+#include "pause_game_state.h"
+
+GameLoop* GameLoop::ms_instance = NULL;
+
+GameLoop* GameLoop::getInstance()
+{
+	return ms_instance;
+}
 
 GameLoop::GameLoop()
 {
@@ -36,8 +46,10 @@ GameLoop::GameLoop()
 	// Init screen 0 to use text with font stored in bg0.
 	PA_InitText(0, 0);
 	
-	MenuGameState* state = new MenuGameState();
+	GameState* state = createState(GameState::ID_MENU);
 	m_states.push(state);
+	
+	ms_instance = this;
 }
 
 GameLoop::~GameLoop()
@@ -48,6 +60,8 @@ GameLoop::~GameLoop()
 		delete m_states.top();
 		m_states.pop();
 	}
+	
+	ms_instance = NULL;
 }
 
 void GameLoop::run()
@@ -117,9 +131,17 @@ GameState* GameLoop::createState(u8 stateId)
 	
 	// Create the state instance depending on ID given.
 	GameState* rval = NULL;
-	if (stateId == 1)
+	if (stateId == GameState::ID_MENU)
 	{
 		rval = new MenuGameState();
+	}
+	else if (stateId == GameState::ID_PLAY)
+	{
+		rval = new PlayGameState();
+	}
+	else if (stateId == GameState::ID_HIGHSCORE)
+	{
+		rval = new HighscoreGameState();
 	}
 	return rval;
 }

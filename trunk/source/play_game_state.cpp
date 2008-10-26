@@ -21,39 +21,40 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __GAME_LOOP_H__
-#define __GAME_LOOP_H__
+#include "play_game_state.h"
 
-#include <PA9.h>
-#include <stack>
+#include "game_music.h"
 
-class GameState;
-
-class GameLoop
+PlayGameState::PlayGameState()
+	: m_isSuspending(false)
 {
-public:
-	GameLoop();
-	~GameLoop();
-	
-	static GameLoop* getInstance();
-	
-	void run();
-	
-	/// Suspends current state and starts the given state.
-	void pushState(u8 stateId);
-	/// Suspends and destroys current state and resumes the one below
-	void popState();
-	/// This will destroy all states on the stack and start given state.
-	void setState(u8 stateId);
-private:
-	static GameLoop* ms_instance;
-	
-	std::stack<GameState*> m_states;
-	/// If not NULL, then this will be pushed on the stack, after current
-	/// state is done.
-	GameState* m_nextState;
-	
-	GameState* createState(u8 stateId);
-};
+}
 
-#endif
+PlayGameState::~PlayGameState()
+{
+}
+
+void PlayGameState::resume()
+{
+	m_isSuspending = false;
+	
+	// Play menu music
+	PA_PlayMod(game_music);
+}
+
+void PlayGameState::suspend()
+{
+	PA_StopMod();
+	
+	m_isSuspending = true;
+}
+
+u8 PlayGameState::run()
+{	
+	return m_isSuspending ? STATE_DONE : STATE_RUNNING;
+}
+
+u8 PlayGameState::getId()
+{
+	return ID_PLAY;
+}
