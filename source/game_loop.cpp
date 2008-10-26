@@ -31,6 +31,11 @@ GameLoop::GameLoop()
 	PA_Init();
 	PA_InitVBL();
 	
+	AS_Init(AS_MODE_16CH);
+	
+	// Init screen 0 to use text with font stored in bg0.
+	PA_InitText(0, 0);
+	
 	MenuGameState* state = new MenuGameState();
 	m_states.push(state);
 }

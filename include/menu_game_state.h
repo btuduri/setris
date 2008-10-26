@@ -43,6 +43,7 @@ private:
 	static const u8 SHOW_HIGHSCORE_OPTION = 1;
 	
 	u8 m_selectedOption;
+	bool m_isSuspending;
 };
 
 #endif
