@@ -27,7 +27,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 Sound media:
 ============
-music.mod is part of public domain.
+menu_music.mod and game_music.mod are public domain.
 
 
 Image media:
