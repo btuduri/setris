@@ -27,8 +27,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "game_loop.h"
 
-#include "stones_data.cpp"
-
 static const unsigned short NUM_TILES = 81;
 
 // Function: main()

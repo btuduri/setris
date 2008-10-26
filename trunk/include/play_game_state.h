@@ -26,6 +26,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "game_state.h"
 
+#include <stack>
+
 class PlayGameState : public GameState
 {
 public:
@@ -39,7 +41,24 @@ public:
 	
 	virtual u8 getId();
 private:
+	struct Place
+	{
+		u8 stoneId;
+		u8 spriteId;
+	};
+	
+	Place m_places[8*6];
+	std::stack<u8> m_availableSprites;
+	
 	bool m_isSuspending;
+	
+	void initPlayField();
+	u8 getRandomStone();
+	u8 createSprite(u8 stoneId, u8 x, u8 y);
+	void destroySprite(u8 spriteId);
+	
+	void showPlayfield();
+	void hidePlayfield();
 };
 
 #endif
