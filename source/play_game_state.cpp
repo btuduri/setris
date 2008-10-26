@@ -24,10 +24,20 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "play_game_state.h"
 
 #include "game_music.h"
+#include "stones_data.cpp"
 
 PlayGameState::PlayGameState()
 	: m_isSuspending(false)
 {
+	PA_LoadSpritePal(0, // Screen
+		0, // Palette number
+		(void*)stones_Pal);	// Palette name
+		
+	initPlayField();
+	for (u8 i = 0; i < 128; ++i)
+	{
+		m_availableSprites.push(i);
+	}
 }
 
 PlayGameState::~PlayGameState()
@@ -40,10 +50,14 @@ void PlayGameState::resume()
 	
 	// Play menu music
 	PA_PlayMod(game_music);
+	
+	showPlayfield();
 }
 
 void PlayGameState::suspend()
 {
+	hidePlayfield();
+	
 	PA_StopMod();
 	
 	m_isSuspending = true;
@@ -57,4 +71,75 @@ u8 PlayGameState::run()
 u8 PlayGameState::getId()
 {
 	return ID_PLAY;
+}
+
+void PlayGameState::initPlayField()
+{
+	// Clear top half.
+	for (u8 y = 0; y < 3; ++y)
+	{
+		for (u8 x = 0; x < 8; ++x)
+		{
+			m_places[y*8+x].stoneId = 255;
+			m_places[y*8+x].spriteId = 255;
+		}
+	}
+	
+	// Fill bottom half with random stones.
+	for (u8 y = 3; y < 6; ++y)
+	{
+		for (u8 x = 0; x < 8; ++x)
+		{
+			m_places[y*8+x].stoneId = getRandomStone();
+			m_places[y*8+x].spriteId = 255;
+		}
+	}
+}
+
+u8 PlayGameState::getRandomStone()
+{
+	return static_cast<u8>(PA_RandMax(80));
+}
+
+u8 PlayGameState::createSprite(u8 stoneId, u8 x, u8 y)
+{
+	u8 id = m_availableSprites.top();
+	m_availableSprites.pop();
+	PA_CreateSprite(0, // Screen
+		id, // Sprite number
+		(void*)(stones_Sprites + stoneId*32*32), // Sprite data
+		OBJ_SIZE_32X32, // Sprite size
+		1, // 256 color mode
+		0, // Sprite palette number
+		x*32, y*32); // X and Y position on the screen
+
+	return id;
+}
+
+void PlayGameState::destroySprite(u8 spriteId)
+{
+	PA_DeleteSprite(0, spriteId);
+	m_availableSprites.push(spriteId);
+}
+
+void PlayGameState::showPlayfield()
+{
+	for (u8 i = 0; i < 48; ++i)
+	{
+		if (m_places[i].stoneId != 255)
+		{
+			m_places[i].spriteId = createSprite(m_places[i].stoneId, i % 8, i / 8);
+		}
+	}
+}
+
+void PlayGameState::hidePlayfield()
+{
+	for (u8 i = 0; i < 48; ++i)
+	{
+		if (m_places[i].spriteId != 255)
+		{
+			destroySprite(m_places[i].spriteId);
+		}
+	}
 }

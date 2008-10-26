@@ -40,6 +40,7 @@ GameLoop::GameLoop()
 {
 	PA_Init();
 	PA_InitVBL();
+	PA_InitRand();
 	
 	AS_Init(AS_MODE_16CH);
 	
