@@ -37,7 +37,7 @@ PlayGameState::PlayGameState()
 		0, // Palette number
 		(void*)stones_Pal);	// Palette name
 		
-	PA_SetRotset(0, 1, 0, 128, 128);
+	PA_SetRotset(0, 1, 0, 300, 300);
 		
 	initPlayField();
 	for (u8 i = 0; i < 128; ++i)
@@ -86,11 +86,15 @@ u8 PlayGameState::run()
 		char msg[32];
 		std::sprintf(msg, "Stylus-Pos: %i / %i", Stylus.X, Stylus.Y);
 		LoggingService::getInstance()->logMessage(msg);
-		u8 x = Stylus.X % 32;
-		u8 y = Stylus.Y % 32;
+		u8 x = Stylus.X / 32;
+		u8 y = Stylus.Y / 32;
+		std::sprintf(msg, "Tile-Pos: %i / %i", x, y);
+		LoggingService::getInstance()->logMessage(msg);
 		
 		if (m_places[y*8+x].spriteId != 255)
 		{
+			std::sprintf(msg, "Hit stone with sprite-id %i", m_places[y*8+x].spriteId);
+			LoggingService::getInstance()->logMessage(msg);
 			// Player hit a sprite with the stylus.
 			// is the place already selected?
 			if (isSelected(m_places[y*8+x]))
@@ -109,6 +113,11 @@ u8 PlayGameState::run()
 			{
 				///@todo check if we have a set.
 			}
+		}
+		else
+		{
+			std::sprintf(msg, "No stone hit");
+			LoggingService::getInstance()->logMessage(msg);
 		}
 	}
 	
