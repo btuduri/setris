@@ -21,45 +21,22 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __GAME_LOOP_H__
-#define __GAME_LOOP_H__
+#ifndef __SETRIS_SERVICE_H__
+#define __SETRIS_SERVICE_H__
 
-#include <PA9.h>
-#include <stack>
-#include <vector>
-
-class GameState;
-class Service;
-
-class GameLoop
+class Service
 {
 public:
-	GameLoop();
-	~GameLoop();
+	Service() : m_active(true) {}
+	virtual ~Service() {}
 	
-	static GameLoop* getInstance();
+	virtual void run() = 0;
 	
-	void run();
+	bool isActive() { return m_active; }
+	void setActive(bool active) { m_active = active; }
 	
-	/// Suspends current state and starts the given state.
-	void pushState(u8 stateId);
-	/// Suspends and destroys current state and resumes the one below
-	void popState();
-	/// This will destroy all states on the stack and start given state.
-	void setState(u8 stateId);
 private:
-	static GameLoop* ms_instance;
-	
-	std::stack<GameState*> m_states;
-	std::vector<Service*> m_services;
-	/// If not NULL, then this will be pushed on the stack, after current
-	/// state is done.
-	GameState* m_nextState;
-	
-	GameState* createState(u8 stateId);
-	
-	/// Run game state independent services and waitvbl.
-	void doInnerLoop();
+    bool m_active;
 };
 
 #endif

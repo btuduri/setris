@@ -21,45 +21,38 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __GAME_LOOP_H__
-#define __GAME_LOOP_H__
+#ifndef __LOGGING_SERVICE_H__
+#define __LOGGING_SERVICE_H__
+
+#include "service.h"
 
 #include <PA9.h>
-#include <stack>
-#include <vector>
+#include <deque>
+#include <string>
 
-class GameState;
-class Service;
-
-class GameLoop
+class LoggingService : public Service
 {
 public:
-	GameLoop();
-	~GameLoop();
+	LoggingService();
+	virtual ~LoggingService();
 	
-	static GameLoop* getInstance();
+	static LoggingService* getInstance();
 	
-	void run();
+	virtual void run();
 	
-	/// Suspends current state and starts the given state.
-	void pushState(u8 stateId);
-	/// Suspends and destroys current state and resumes the one below
-	void popState();
-	/// This will destroy all states on the stack and start given state.
-	void setState(u8 stateId);
+	void logMessage(const std::string& msg);
+	void setStaticText(u8 slot, const std::string& text);
+	
 private:
-	static GameLoop* ms_instance;
+	static LoggingService* ms_instance;
 	
-	std::stack<GameState*> m_states;
-	std::vector<Service*> m_services;
-	/// If not NULL, then this will be pushed on the stack, after current
-	/// state is done.
-	GameState* m_nextState;
+	const std::string m_emptyLine;
 	
-	GameState* createState(u8 stateId);
+	std::deque<std::string> m_log;
+	std::string m_staticTexts[5];
 	
-	/// Run game state independent services and waitvbl.
-	void doInnerLoop();
+	bool m_updateLog;
+	bool m_updateStaticText;
 };
 
 #endif
