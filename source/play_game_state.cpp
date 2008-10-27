@@ -24,7 +24,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "play_game_state.h"
 
 #include "game_music.h"
+#include "logging_service.h"
+
 #include "stones_data.cpp"
+
+#include <cstdio>
 
 PlayGameState::PlayGameState()
 	: m_isSuspending(false)
@@ -79,6 +83,9 @@ u8 PlayGameState::run()
 	
 	if (Stylus.Newpress)
 	{
+		char msg[32];
+		std::sprintf(msg, "Stylus-Pos: %i / %i", Stylus.X, Stylus.Y);
+		LoggingService::getInstance()->logMessage(msg);
 		u8 x = Stylus.X % 32;
 		u8 y = Stylus.Y % 32;
 		

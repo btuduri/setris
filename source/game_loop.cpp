@@ -28,6 +28,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "play_game_state.h"
 #include "highscore_game_state.h"
 #include "pause_game_state.h"
+#include "logging_service.h"
 
 GameLoop* GameLoop::ms_instance = NULL;
 
@@ -36,7 +37,7 @@ GameLoop* GameLoop::getInstance()
 	return ms_instance;
 }
 
-GameLoop::GameLoop()
+GameLoop::GameLoop() : m_states(), m_services(), m_nextState(NULL)
 {
 	PA_Init();
 	PA_InitVBL();
@@ -49,6 +50,9 @@ GameLoop::GameLoop()
 	
 	GameState* state = createState(GameState::ID_MENU);
 	m_states.push(state);
+	
+	// init services
+	m_services.push_back(new LoggingService());
 	
 	ms_instance = this;
 }
@@ -91,9 +95,19 @@ void GameLoop::run()
 			}
 		}
 		
-		PA_WaitForVBL();
+		doInnerLoop();
 	}
 
+}
+
+void GameLoop::doInnerLoop()
+{
+	for (u8 i = 0; i < m_services.size(); ++i)
+	{
+		m_services[i]->run();
+	}
+	
+	PA_WaitForVBL();
 }
 
 void GameLoop::pushState(u8 stateId)
@@ -115,7 +129,7 @@ void GameLoop::setState(u8 stateId)
 		m_states.top()->suspend();
 		while (m_states.top()->run() == GameState::STATE_DONE)
 		{
-			PA_WaitForVBL();
+			doInnerLoop();
 		}
 		delete m_states.top();
 		m_states.pop();
