@@ -29,6 +29,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "stones_data.cpp"
 
 #include <cstdio>
+#include <cmath>
+
+#define PI 3.14159265
 
 PlayGameState::PlayGameState()
 	: m_isSuspending(false)
@@ -37,6 +40,7 @@ PlayGameState::PlayGameState()
 		0, // Palette number
 		(void*)stones_Pal);	// Palette name
 		
+	PA_SetRotset(0, 0, 0, 256, 256);
 	PA_SetRotset(0, 1, 0, 300, 300);
 		
 	initPlayField();
@@ -49,6 +53,17 @@ PlayGameState::PlayGameState()
 	{
 		m_selection[i].spriteId = 255;
 	}
+	
+	// Prepare animation sizes
+	u8 stepsize = 360 / 60;
+	char msg[32];
+	for (u8 i = 0; i < 60; ++i)
+	{
+		m_animSequence[i] = (u16) (255 + 64 + (std::sin((PI/180.0f)*stepsize*i) * 64.0f));
+		std::sprintf(msg, "Anim-Pos: %i", m_animSequence[i]);
+		LoggingService::getInstance()->logMessage(msg);
+	}
+
 }
 
 PlayGameState::~PlayGameState()
@@ -111,7 +126,12 @@ u8 PlayGameState::run()
 			// Do we have three pieces selected now?
 			if (getNumSelected() == 3)
 			{
-				///@todo check if we have a set.
+				if (checkSet())
+				{
+				}
+				else
+				{
+				}
 			}
 		}
 		else
@@ -120,6 +140,8 @@ u8 PlayGameState::run()
 			LoggingService::getInstance()->logMessage(msg);
 		}
 	}
+	
+	animSelectedSprites();
 	
 	return STATE_RUNNING;
 }
@@ -181,15 +203,14 @@ void PlayGameState::destroySprite(u8 spriteId)
 
 void PlayGameState::setSpriteSelected(u8 spriteId, bool selected)
 {
-	PA_SetSpritePrio(0, spriteId, selected ? 1 : 10);
-	if (selected)
-	{
-		PA_SetSpriteRotEnable(0, spriteId, 1);
-	}
-	else
-	{
-		PA_SetSpriteRotDisable(0, spriteId);
-	}
+	PA_SetSpriteRotEnable(0, spriteId, selected ? 1 : 0);
+}
+
+void PlayGameState::animSelectedSprites()
+{
+	u16 scale = m_animSequence[m_animIndex];
+	PA_SetRotset(0, 1, 0, scale, scale);
+	m_animIndex = m_animIndex >= 59 ? 0 : m_animIndex+1;
 }
 
 void PlayGameState::showPlayfield()
@@ -260,4 +281,17 @@ u8 PlayGameState::getNumSelected() const
 	}
 	
 	return rval;
+}
+
+bool PlayGameState::checkSet() const
+{
+	bool ok = true;
+	for (u8 i = 0; i < 4; ++i)
+	{
+		if (!ok)
+		{
+			break;
+		}
+	}
+	return ok;
 }
