@@ -48,6 +48,8 @@ private:
 		u8 spriteId;
 	};
 	
+	Place m_emptyPlace;
+	
 	Place m_places[8*6];
 	Place m_selection[3];
 	
