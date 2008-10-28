@@ -44,7 +44,7 @@ LoggingService::LoggingService()
 	
 	for (u8 i = 0; i < 5; ++i)
 	{
-		m_staticTexts[i] = "X";
+		m_staticTexts[i] = m_emptyLine;
 	}
 }
 
