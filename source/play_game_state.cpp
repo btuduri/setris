@@ -108,7 +108,7 @@ u8 PlayGameState::run()
 		
 		if (m_places[y*8+x].spriteId != 255)
 		{
-			std::sprintf(msg, "Hit stone with sprite-id %i", m_places[y*8+x].spriteId);
+			std::sprintf(msg, "Hit sprite-id %i stone-id %i", m_places[y*8+x].spriteId, m_places[y*8+x].stoneId);
 			LoggingService::getInstance()->logMessage(msg);
 			// Player hit a sprite with the stylus.
 			// is the place already selected?
@@ -128,9 +128,11 @@ u8 PlayGameState::run()
 			{
 				if (checkSet())
 				{
+					LoggingService::getInstance()->logMessage("Set!!");
 				}
 				else
 				{
+					LoggingService::getInstance()->logMessage("No Set, aaaw");
 				}
 			}
 		}
@@ -248,7 +250,7 @@ void PlayGameState::setSelected(const Place& place)
 	{
 		if (m_selection[i].spriteId == 255)
 		{
-			m_selection[i].spriteId = place.spriteId;
+			m_selection[i] = place;
 			setSpriteSelected(place.spriteId, true);
 			break;
 		}
@@ -274,7 +276,7 @@ u8 PlayGameState::getNumSelected() const
 	
 	for (u8 i = 0; i < 3; ++i)
 	{
-		if (m_selection[i].spriteId == 255)
+		if (m_selection[i].spriteId != 255)
 		{
 			++rval;
 		}
@@ -285,13 +287,29 @@ u8 PlayGameState::getNumSelected() const
 
 bool PlayGameState::checkSet() const
 {
-	bool ok = true;
+	bool ok = false;
+	u8 factor = 1;
 	for (u8 i = 0; i < 4; ++i)
 	{
+		ok = false;
+		
+		u8 v1 = (m_selection[0].stoneId / factor) % 3;
+		u8 v2 = (m_selection[1].stoneId / factor) % 3;
+		u8 v3 = (m_selection[2].stoneId / factor) % 3;
+		
+		if (v1 == v2 && v2 == v3 && v3 == v1)
+		{
+			ok = true;
+		}
+		if (v1 != v2 && v2 != v3 && v3 != v1)
+		{
+			ok = true;
+		}
 		if (!ok)
 		{
 			break;
 		}
+		factor *= 3;
 	}
 	return ok;
 }
