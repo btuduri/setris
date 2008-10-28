@@ -43,11 +43,17 @@ PlayGameState::PlayGameState()
 	PA_SetRotset(0, 0, 0, 256, 256);
 	PA_SetRotset(0, 1, 0, 300, 300);
 		
-	initPlayField();
+	for (u8 i = 0; i < 81; ++i)
+	{
+		m_availableStones.push_back(i);
+	}
+	
 	for (u8 i = 0; i < 128; ++i)
 	{
 		m_availableSprites.push(i);
 	}
+	
+	initPlayField();
 	
 	for (u8 i = 0; i < 3; ++i)
 	{
@@ -133,6 +139,8 @@ u8 PlayGameState::run()
 				else
 				{
 					LoggingService::getInstance()->logMessage("No Set, aaaw");
+					// deselect all stones.
+					unselectAll();
 				}
 			}
 		}
@@ -178,7 +186,10 @@ void PlayGameState::initPlayField()
 
 u8 PlayGameState::getRandomStone()
 {
-	return static_cast<u8>(PA_RandMax(80));
+	u8 idx =  static_cast<u8>(PA_RandMax(m_availableStones.size()-1));
+	u8 rval = m_availableStones[idx];
+	m_availableStones.erase(m_availableStones.begin() + idx);
+	return rval;
 }
 
 u8 PlayGameState::createSprite(u8 stoneId, u8 x, u8 y)
@@ -253,6 +264,18 @@ void PlayGameState::setSelected(const Place& place)
 			m_selection[i] = place;
 			setSpriteSelected(place.spriteId, true);
 			break;
+		}
+	}
+}
+
+void PlayGameState::unselectAll()
+{
+	for (u8 i = 0; i < 3; ++i)
+	{
+		if (m_selection[i].spriteId != 255)
+		{
+			setSpriteSelected(m_selection[i].spriteId, false);
+			m_selection[i].spriteId = 255;
 		}
 	}
 }

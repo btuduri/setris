@@ -27,6 +27,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "game_state.h"
 
 #include <stack>
+#include <vector>
 
 class PlayGameState : public GameState
 {
@@ -54,6 +55,7 @@ private:
 	u8 m_animIndex;
 	
 	std::stack<u8> m_availableSprites;
+	std::vector<u8> m_availableStones;
 	
 	bool m_isSuspending;
 	
@@ -70,6 +72,8 @@ private:
 	bool isSelected(const Place& place) const;
 	void setSelected(const Place& place);
 	void setUnselected(const Place& place);
+	void unselectAll();
+	
 	u8 getNumSelected() const;
 	
 	bool checkSet() const;
