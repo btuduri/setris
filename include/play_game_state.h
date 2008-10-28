@@ -54,6 +54,8 @@ private:
 	u16 m_animSequence[60];
 	u8 m_animIndex;
 	
+	int m_score;
+	
 	std::stack<u8> m_availableSprites;
 	std::vector<u8> m_availableStones;
 	
@@ -73,6 +75,8 @@ private:
 	void setSelected(const Place& place);
 	void setUnselected(const Place& place);
 	void unselectAll();
+	/// Selected stones are removed from the playfield.
+	void destroySelected();
 	
 	u8 getNumSelected() const;
 	
