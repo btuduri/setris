@@ -69,7 +69,10 @@ PlayGameState::PlayGameState()
 		std::sprintf(msg, "Anim-Pos: %i", m_animSequence[i]);
 		LoggingService::getInstance()->logMessage(msg);
 	}
-
+	
+	// Score, time and multiplicators.
+	m_score = 0;
+	LoggingService::getInstance()->setStaticText(0, " Score: 0");
 }
 
 PlayGameState::~PlayGameState()
@@ -135,6 +138,14 @@ u8 PlayGameState::run()
 				if (checkSet())
 				{
 					LoggingService::getInstance()->logMessage("Set!!");
+					// Remove stones.
+					destroySelected();
+					// Calculate new score
+					m_score++;
+					// Adjust multiplicators.
+					
+					std::sprintf(msg, " Score: %i", m_score);
+					LoggingService::getInstance()->setStaticText(0, msg);
 				}
 				else
 				{
@@ -276,6 +287,30 @@ void PlayGameState::unselectAll()
 		{
 			setSpriteSelected(m_selection[i].spriteId, false);
 			m_selection[i].spriteId = 255;
+		}
+	}
+}
+
+void PlayGameState::destroySelected()
+{
+	for (u8 i = 0; i < 3; ++i)
+	{
+		if (m_selection[i].spriteId != 255)
+		{
+			// find the place
+			for (u8 ii = 0; ii < 8*6; ++ii)
+			{
+				if (m_selection[i].spriteId == m_places[ii].spriteId)
+				{
+					setSpriteSelected(m_selection[i].spriteId, false);
+					destroySprite(m_selection[i].spriteId);
+					m_availableStones.push_back(m_selection[i].stoneId);
+					m_selection[i].spriteId = 255;
+					m_selection[i].stoneId = 255;
+					m_places[i].spriteId = 255;
+					m_places[i].stoneId = 255;
+				}
+			}
 		}
 	}
 }
