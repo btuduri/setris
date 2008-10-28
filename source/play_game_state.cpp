@@ -36,6 +36,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 PlayGameState::PlayGameState()
 	: m_isSuspending(false)
 {
+	m_emptyPlace.spriteId = 255;
+	m_emptyPlace.stoneId = 255;
+	
 	PA_LoadSpritePal(0, // Screen
 		0, // Palette number
 		(void*)stones_Pal);	// Palette name
@@ -286,7 +289,7 @@ void PlayGameState::unselectAll()
 		if (m_selection[i].spriteId != 255)
 		{
 			setSpriteSelected(m_selection[i].spriteId, false);
-			m_selection[i].spriteId = 255;
+			m_selection[i] = m_emptyPlace;
 		}
 	}
 }
@@ -305,10 +308,8 @@ void PlayGameState::destroySelected()
 					setSpriteSelected(m_selection[i].spriteId, false);
 					destroySprite(m_selection[i].spriteId);
 					m_availableStones.push_back(m_selection[i].stoneId);
-					m_selection[i].spriteId = 255;
-					m_selection[i].stoneId = 255;
-					m_places[i].spriteId = 255;
-					m_places[i].stoneId = 255;
+					m_selection[i] = m_emptyPlace;
+					m_places[ii] = m_emptyPlace;
 				}
 			}
 		}
@@ -321,7 +322,7 @@ void PlayGameState::setUnselected(const Place& place)
 	{
 		if (m_selection[i].spriteId == place.spriteId)
 		{
-			m_selection[i].spriteId = 255;
+			m_selection[i] = m_emptyPlace;
 			setSpriteSelected(place.spriteId, false);
 			break;
 		}
