@@ -75,6 +75,14 @@ PlayGameState::PlayGameState()
 	
 	// Score, time and multiplicators.
 	m_score = 0;
+	m_framesSinceLastSet = 0;
+	m_framesSinceLastNewStone = 0;
+	m_framesTillNextStone = 300;
+	m_framesTillSetCombo = 180;
+	
+	m_comboMultiplicator = 1;
+	m_sets = 0;
+	
 	LoggingService::getInstance()->setStaticText(0, " Score: 0");
 }
 
@@ -147,6 +155,15 @@ u8 PlayGameState::run()
 					// Calculate new score
 					m_score++;
 					// Adjust multiplicators.
+					if (m_framesSinceLastNewStone < m_framesTillNextStone)
+					{
+						m_comboMultiplicator++;
+						m_framesSinceLastNewStone = 0;
+					}
+					else
+					{
+						m_comboMultiplicator = 1;
+					}
 					
 					std::sprintf(msg, " Score: %i", m_score);
 					LoggingService::getInstance()->setStaticText(0, msg);
@@ -166,8 +183,17 @@ u8 PlayGameState::run()
 		}
 	}
 	
+	if (m_framesSinceLastNewStone > m_framesTillNextStone)
+	{
+		addNewStone();
+		m_framesSinceLastNewStone = 0;
+	}
+	
 	animSelectedSprites();
 	moveSprites();
+	
+	m_framesSinceLastSet++;
+	m_framesSinceLastNewStone++;
 	
 	return STATE_RUNNING;
 }
@@ -419,5 +445,20 @@ void PlayGameState::moveSprites()
 		PA_SetSpriteY(0, m_fallingSprites[i].spriteId, currentY);
 		if (currentY == targetY) m_fallingSprites.erase(m_fallingSprites.begin() + i);
 		else ++i;
+	}
+}
+
+void PlayGameState::addNewStone()
+{
+	u8 x = PA_RandMax(7);
+	if (m_places[x].spriteId == 255)
+	{
+			m_places[x].stoneId = getRandomStone();
+			m_places[x].spriteId = createSprite(m_places[x].stoneId, x, 0);
+			compactPlayfield();
+	}
+	else
+	{
+		// Game over
 	}
 }

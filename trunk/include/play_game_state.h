@@ -65,6 +65,15 @@ private:
 	
 	int m_score;
 	
+	u16 m_framesSinceLastSet;
+	u16 m_framesSinceLastNewStone;
+	
+	u16 m_framesTillNextStone;
+	u16 m_framesTillSetCombo;
+	
+	u16 m_comboMultiplicator;
+	u8 m_sets;
+	
 	std::stack<u8> m_availableSprites;
 	std::vector<u8> m_availableStones;
 	std::vector<FallingSprite> m_fallingSprites;
@@ -93,6 +102,8 @@ private:
 	void compactPlayfield();
 	/// let falling sprites fall.
 	void moveSprites();
+	
+	void addNewStone();
 	
 	
 	u8 getNumSelected() const;
