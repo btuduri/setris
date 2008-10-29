@@ -48,6 +48,13 @@ private:
 		u8 spriteId;
 	};
 	
+	struct FallingSprite
+	{
+		u8 spriteId;
+		u8 targetPlace;
+		u8 velocity;
+	};
+	
 	Place m_emptyPlace;
 	
 	Place m_places[8*6];
@@ -60,11 +67,14 @@ private:
 	
 	std::stack<u8> m_availableSprites;
 	std::vector<u8> m_availableStones;
+	std::vector<FallingSprite> m_fallingSprites;
 	
 	bool m_isSuspending;
 	
 	void initPlayField();
+	
 	u8 getRandomStone();
+	
 	u8 createSprite(u8 stoneId, u8 x, u8 y);
 	void destroySprite(u8 spriteId);
 	void setSpriteSelected(u8 spriteId, bool selected);
@@ -79,6 +89,11 @@ private:
 	void unselectAll();
 	/// Selected stones are removed from the playfield.
 	void destroySelected();
+	/// Reorganise playfield to fill gaps.
+	void compactPlayfield();
+	/// let falling sprites fall.
+	void moveSprites();
+	
 	
 	u8 getNumSelected() const;
 	

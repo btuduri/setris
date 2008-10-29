@@ -141,8 +141,9 @@ u8 PlayGameState::run()
 				if (checkSet())
 				{
 					LoggingService::getInstance()->logMessage("Set!!");
-					// Remove stones.
+					// Remove stones and compact field
 					destroySelected();
+					compactPlayfield();
 					// Calculate new score
 					m_score++;
 					// Adjust multiplicators.
@@ -166,6 +167,7 @@ u8 PlayGameState::run()
 	}
 	
 	animSelectedSprites();
+	moveSprites();
 	
 	return STATE_RUNNING;
 }
@@ -306,8 +308,8 @@ void PlayGameState::destroySelected()
 				if (m_selection[i].spriteId == m_places[ii].spriteId)
 				{
 					setSpriteSelected(m_selection[i].spriteId, false);
-					destroySprite(m_selection[i].spriteId);
 					m_availableStones.push_back(m_selection[i].stoneId);
+					destroySprite(m_selection[i].spriteId);
 					m_selection[i] = m_emptyPlace;
 					m_places[ii] = m_emptyPlace;
 				}
@@ -371,4 +373,51 @@ bool PlayGameState::checkSet() const
 		factor *= 3;
 	}
 	return ok;
+}
+
+void PlayGameState::compactPlayfield()
+{	
+	// Process each column from bottom to top.
+	for (u8 x = 0; x < 8; ++x)
+	{
+		u8 gap = 0; // y-index of the last gap found.
+		for (u8 yy = 6; yy > 0; --yy)
+		{
+			u8 y = yy-1;
+			if (m_places[y*8+x].spriteId == 255)
+			{
+				// Found a gap.
+				if (gap < y) gap = y;
+			}
+			else if (gap > y)
+			{
+				// A stone over a gap. Compact it.
+				m_places[gap*8+x] = m_places[y*8+x];
+				m_places[y*8+x] = m_emptyPlace;
+				FallingSprite fs;
+				fs.spriteId = m_places[gap*8+x].spriteId;
+				fs.targetPlace = gap*8+x;
+				fs.velocity = 1;
+				m_fallingSprites.push_back(fs);
+				
+				--gap;
+			}
+		}
+	}
+}
+
+void PlayGameState::moveSprites()
+{
+	// Move sprites and increment velocity.
+	for (u8 i = 0; i < m_fallingSprites.size();)
+	{
+		u8 targetY = (m_fallingSprites[i].targetPlace / 8) * 32;
+		u8 currentY = PA_GetSpriteY(0, m_fallingSprites[i].spriteId);
+		currentY += m_fallingSprites[i].velocity;
+		currentY = std::min(targetY, currentY);
+		m_fallingSprites[i].velocity += 2;
+		PA_SetSpriteY(0, m_fallingSprites[i].spriteId, currentY);
+		if (currentY == targetY) m_fallingSprites.erase(m_fallingSprites.begin() + i);
+		else ++i;
+	}
 }
