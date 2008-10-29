@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "game_music.h"
 #include "logging_service.h"
+#include "game_loop.h"
 
 #include "stones_data.cpp"
 
@@ -460,5 +461,6 @@ void PlayGameState::addNewStone()
 	else
 	{
 		// Game over
+		GameLoop::getInstance()->setState(ID_GAMEOVER);
 	}
 }

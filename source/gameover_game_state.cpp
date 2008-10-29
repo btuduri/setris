@@ -21,38 +21,43 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __GAME_STATE_H__
-#define __GAME_STATE_H__
+#include "gameover_game_state.h"
+#include "game_loop.h"
 
-#include <PA9.h>
-
-class GameState
+GameoverGameState::GameoverGameState() : m_isSuspending(false)
 {
-public:
-	static const u8 ID_MENU = 1;
-	static const u8 ID_PLAY = 2;
-	static const u8 ID_PAUSE = 3;
-	static const u8 ID_HIGHSCORE = 4;
-	static const u8 ID_GAMEOVER = 5;
+}
 
-	static const u8 STATE_RESUMING = 1;
-	static const u8 STATE_RUNNING = 2;
-	static const u8 STATE_SUSPENDING = 3;
-	static const u8 STATE_DONE = 4;
-	
-	GameState() {};
-	virtual ~GameState() {};
-	
-	virtual void resume() = 0;
-	virtual void suspend() = 0;
+GameoverGameState::~GameoverGameState()
+{
+}
 
-	/**
-	 * Advances this state. Called every frame that this state is active.
-	 * @return the internal state of this game state.
-	 */
-	virtual u8 run() = 0;
-	
-	virtual u8 getId() = 0;
-};
+void GameoverGameState::resume()
+{
+	PA_OutputSimpleText(0, 12, 10, "Game Over");
+}
 
-#endif
+void GameoverGameState::suspend()
+{
+	PA_OutputSimpleText(0, 12, 10, "         ");
+	m_isSuspending = true;
+}
+
+u8 GameoverGameState::run()
+{
+	if (m_isSuspending)
+	{
+		return STATE_DONE;
+	}
+
+	if (Stylus.Newpress || Pad.Newpress.A || Pad.Newpress.B)
+	{
+		GameLoop::getInstance()->setState(ID_MENU);
+	}
+	return STATE_RUNNING;
+}
+
+u8 GameoverGameState::getId()
+{
+	return ID_GAMEOVER;
+}

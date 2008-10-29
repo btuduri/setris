@@ -28,6 +28,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "play_game_state.h"
 #include "highscore_game_state.h"
 #include "pause_game_state.h"
+#include "gameover_game_state.h"
 #include "logging_service.h"
 
 GameLoop* GameLoop::ms_instance = NULL;
@@ -157,6 +158,10 @@ GameState* GameLoop::createState(u8 stateId)
 	else if (stateId == GameState::ID_HIGHSCORE)
 	{
 		rval = new HighscoreGameState();
+	}
+	else if (stateId == GameState::ID_GAMEOVER)
+	{
+		rval = new GameoverGameState();
 	}
 	return rval;
 }

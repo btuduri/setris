@@ -21,38 +21,25 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef __GAME_STATE_H__
-#define __GAME_STATE_H__
+#ifndef __GAMEOVER_GAME_STATE_H__
+#define __GAMEOVER_GAME_STATE_H__
 
-#include <PA9.h>
+#include "game_state.h"
 
-class GameState
+class GameoverGameState : public GameState
 {
 public:
-	static const u8 ID_MENU = 1;
-	static const u8 ID_PLAY = 2;
-	static const u8 ID_PAUSE = 3;
-	static const u8 ID_HIGHSCORE = 4;
-	static const u8 ID_GAMEOVER = 5;
+	GameoverGameState();
+	virtual ~GameoverGameState();
+	
+	virtual void resume();
+	virtual void suspend();
 
-	static const u8 STATE_RESUMING = 1;
-	static const u8 STATE_RUNNING = 2;
-	static const u8 STATE_SUSPENDING = 3;
-	static const u8 STATE_DONE = 4;
+	virtual u8 run();
 	
-	GameState() {};
-	virtual ~GameState() {};
-	
-	virtual void resume() = 0;
-	virtual void suspend() = 0;
-
-	/**
-	 * Advances this state. Called every frame that this state is active.
-	 * @return the internal state of this game state.
-	 */
-	virtual u8 run() = 0;
-	
-	virtual u8 getId() = 0;
+	virtual u8 getId();
+private:
+	bool m_isSuspending;
 };
 
 #endif
