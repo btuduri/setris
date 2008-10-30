@@ -33,7 +33,6 @@ public:
 	static const u8 ID_PLAY = 2;
 	static const u8 ID_PAUSE = 3;
 	static const u8 ID_HIGHSCORE = 4;
-	static const u8 ID_GAMEOVER = 5;
 
 	static const u8 STATE_RESUMING = 1;
 	static const u8 STATE_RUNNING = 2;
