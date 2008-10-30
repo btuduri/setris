@@ -66,12 +66,9 @@ PlayGameState::PlayGameState()
 	
 	// Prepare animation sizes
 	u8 stepsize = 360 / 60;
-	char msg[32];
 	for (u8 i = 0; i < 60; ++i)
 	{
 		m_animSequence[i] = (u16) (255 + 64 + (std::sin((PI/180.0f)*stepsize*i) * 64.0f));
-		std::sprintf(msg, "Anim-Pos: %i", m_animSequence[i]);
-		LoggingService::getInstance()->logMessage(msg);
 	}
 	
 	// Score, time and multiplicators.
@@ -461,6 +458,6 @@ void PlayGameState::addNewStone()
 	else
 	{
 		// Game over
-		GameLoop::getInstance()->setState(ID_GAMEOVER);
+		GameLoop::getInstance()->popState();
 	}
 }

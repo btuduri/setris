@@ -28,7 +28,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "play_game_state.h"
 #include "highscore_game_state.h"
 #include "pause_game_state.h"
-#include "gameover_game_state.h"
 #include "logging_service.h"
 
 GameLoop* GameLoop::ms_instance = NULL;
@@ -122,25 +121,6 @@ void GameLoop::popState()
 	m_states.top()->suspend();	
 }
 
-void GameLoop::setState(u8 stateId)
-{
-	// empty stack.
-	while (!m_states.empty())
-	{
-		m_states.top()->suspend();
-		while (m_states.top()->run() == GameState::STATE_DONE)
-		{
-			doInnerLoop();
-		}
-		delete m_states.top();
-		m_states.pop();
-	}
-	
-	// push new one.
-	m_states.push(createState(stateId));
-	m_states.top()->resume();
-}
-
 GameState* GameLoop::createState(u8 stateId)
 {
 	/// @todo use a proper factory instead of hard coding states here.
@@ -158,10 +138,6 @@ GameState* GameLoop::createState(u8 stateId)
 	else if (stateId == GameState::ID_HIGHSCORE)
 	{
 		rval = new HighscoreGameState();
-	}
-	else if (stateId == GameState::ID_GAMEOVER)
-	{
-		rval = new GameoverGameState();
 	}
 	return rval;
 }

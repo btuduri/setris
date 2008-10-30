@@ -45,8 +45,6 @@ public:
 	void pushState(u8 stateId);
 	/// Suspends and destroys current state and resumes the one below
 	void popState();
-	/// This will destroy all states on the stack and start given state.
-	void setState(u8 stateId);
 private:
 	static GameLoop* ms_instance;
 	
