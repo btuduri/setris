@@ -78,7 +78,7 @@ u8 HighscoreGameState::run()
 	// Button A to start currently selected option.
 	
 	// With only two options, this is easy.
-	if (Pad.Newpress.B)
+	if (Pad.Newpress.B || Stylus.Newpress)
 	{
 		GameLoop::getInstance()->popState();
 	}

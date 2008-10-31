@@ -37,7 +37,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 const PlayGameState::Place PlayGameState::EMPTY_PLACE = { PlayGameState::EMPTY, PlayGameState::EMPTY };
 
 PlayGameState::PlayGameState()
-	: m_isSuspending(false)
+	: m_isSuspending(false), m_gameOver(false)
 {	
 	PA_LoadSpritePal(0, // Screen
 		0, // Palette number
@@ -96,6 +96,7 @@ void PlayGameState::resume()
 void PlayGameState::suspend()
 {
 	hidePlayfield();
+	PA_OutputSimpleText(0, 11, 10, "          ");
 	
 	PA_StopMod();
 	
@@ -109,7 +110,14 @@ u8 PlayGameState::run()
 		return STATE_DONE;
 	}
 	
-	if (Stylus.Newpress)
+	if (m_gameOver)
+	{
+		if (Stylus.Newpress || Pad.Newpress.A || Pad.Newpress.B)
+		{
+			GameLoop::getInstance()->popState();
+		}
+	}
+	else if (Stylus.Newpress)
 	{
 		char msg[32];
 		std::sprintf(msg, "Stylus-Pos: %i / %i", Stylus.X, Stylus.Y);
@@ -456,6 +464,14 @@ void PlayGameState::addNewStone()
 	else
 	{
 		// Game over
-		GameLoop::getInstance()->popState();
+		gameOver();
 	}
+}
+
+void PlayGameState::gameOver()
+{
+	m_gameOver = true;
+	hidePlayfield();
+	PA_StopMod();
+	PA_OutputSimpleText(0, 11, 10, "Game Over!");
 }
