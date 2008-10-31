@@ -68,6 +68,8 @@ PlayGameState::PlayGameState()
 	
 	// Score, time and multiplicators.
 	m_score = 0;
+	m_sets = 0;
+	m_level = 1;
 	m_framesSinceLastSet = 0;
 	m_framesSinceLastNewStone = 0;
 	m_framesTillNextStone = 300;
@@ -77,6 +79,8 @@ PlayGameState::PlayGameState()
 	m_sets = 0;
 	
 	LoggingService::getInstance()->setStaticText(0, " Score: 0");
+	LoggingService::getInstance()->setStaticText(1, " Level: 1");
+	LoggingService::getInstance()->setStaticText(2, " Sets : 0");
 }
 
 PlayGameState::~PlayGameState()
@@ -116,6 +120,8 @@ u8 PlayGameState::run()
 		{
 			GameLoop::getInstance()->popState();
 		}
+		
+		return STATE_RUNNING;
 	}
 	else if (Stylus.Newpress)
 	{
@@ -154,7 +160,10 @@ u8 PlayGameState::run()
 					destroySelected();
 					compactPlayfield();
 					// Calculate new score
-					m_score++;
+					m_sets++;
+					m_setsTillNextLevel++;
+					m_score += m_level*m_comboMultiplicator;
+					
 					// Adjust multiplicators.
 					if (m_framesSinceLastSet < m_framesTillSetCombo)
 					{
@@ -166,8 +175,20 @@ u8 PlayGameState::run()
 						m_comboMultiplicator = 1;
 					}
 					
+					// adjust level
+					if (m_setsTillNextLevel >= 10)
+					{
+						m_setsTillNextLevel = 0;
+						if (m_level < 10) m_level++;
+						m_framesTillNextStone = 300 - (30*(m_level-1));
+					}
+					
 					std::sprintf(msg, " Score: %i", m_score);
 					LoggingService::getInstance()->setStaticText(0, msg);
+					std::sprintf(msg, " Level: %i", m_level);
+					LoggingService::getInstance()->setStaticText(1, msg);
+					std::sprintf(msg, " Sets : %i", m_sets);
+					LoggingService::getInstance()->setStaticText(2, msg);
 				}
 				else
 				{
