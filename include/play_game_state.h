@@ -46,6 +46,16 @@ private:
 	{
 		u8 stoneId;
 		u8 spriteId;
+		
+		bool operator==(const Place& rhs)
+		{
+			return stoneId == rhs.stoneId && spriteId == rhs.spriteId;
+		}
+		
+		bool operator!=(const Place& rhs)
+		{
+			return !(*this == rhs);
+		}
 	};
 	
 	struct FallingSprite
@@ -55,8 +65,10 @@ private:
 		u8 velocity;
 	};
 	
-	Place m_emptyPlace;
-	
+	static const u8 EMPTY = 255;
+	static const Place EMPTY_PLACE;
+	static const u8 NUM_STONES = 81;
+		
 	Place m_places[8*6];
 	Place m_selection[3];
 	
@@ -92,9 +104,9 @@ private:
 	void showPlayfield();
 	void hidePlayfield();
 	
-	bool isSelected(const Place& place) const;
-	void setSelected(const Place& place);
-	void setUnselected(const Place& place);
+	bool isSelected(const Place place) const;
+	void setSelected(const Place place);
+	void setUnselected(const Place place);
 	void unselectAll();
 	/// Selected stones are removed from the playfield.
 	void destroySelected();
