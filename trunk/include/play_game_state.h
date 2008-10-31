@@ -79,6 +79,10 @@ private:
 	u8 m_animIndex;
 	
 	int m_score;
+	u16 m_sets;
+	u8 m_setsTillNextLevel;
+	
+	u8 m_level;
 	
 	u16 m_framesSinceLastSet;
 	u16 m_framesSinceLastNewStone;
@@ -87,7 +91,6 @@ private:
 	u16 m_framesTillSetCombo;
 	
 	u16 m_comboMultiplicator;
-	u8 m_sets;
 	
 	std::stack<u8> m_availableSprites;
 	std::vector<u8> m_availableStones;
