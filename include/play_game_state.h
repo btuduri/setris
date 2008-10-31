@@ -47,12 +47,12 @@ private:
 		u8 stoneId;
 		u8 spriteId;
 		
-		bool operator==(const Place& rhs)
+		bool operator==(const Place& rhs) const
 		{
 			return stoneId == rhs.stoneId && spriteId == rhs.spriteId;
 		}
 		
-		bool operator!=(const Place& rhs)
+		bool operator!=(const Place& rhs) const
 		{
 			return !(*this == rhs);
 		}
@@ -68,8 +68,11 @@ private:
 	static const u8 EMPTY = 255;
 	static const Place EMPTY_PLACE;
 	static const u8 NUM_STONES = 81;
+	static const u8 NUM_ROWS = 6;
+	static const u8 NUM_COLS = 8;
+	static const u8 NUM_PLACES = NUM_ROWS * NUM_COLS;
 		
-	Place m_places[8*6];
+	Place m_places[NUM_PLACES];
 	Place m_selection[3];
 	
 	u16 m_animSequence[60];
