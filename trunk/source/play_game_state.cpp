@@ -199,21 +199,21 @@ u8 PlayGameState::getId()
 void PlayGameState::initPlayField()
 {
 	// Clear top half.
-	for (u8 y = 0; y < 3; ++y)
+	for (u8 y = 0; y < NUM_ROWS / 2; ++y)
 	{
-		for (u8 x = 0; x < 8; ++x)
+		for (u8 x = 0; x < NUM_COLS; ++x)
 		{
-			m_places[y*8+x] = EMPTY_PLACE;
+			m_places[y*NUM_COLS+x] = EMPTY_PLACE;
 		}
 	}
 	
 	// Fill bottom half with random stones.
-	for (u8 y = 3; y < 6; ++y)
+	for (u8 y = NUM_ROWS / 2; y < NUM_ROWS; ++y)
 	{
-		for (u8 x = 0; x < 8; ++x)
+		for (u8 x = 0; x < NUM_COLS; ++x)
 		{
-			m_places[y*8+x].stoneId = getRandomStone();
-			m_places[y*8+x].spriteId = EMPTY;
+			m_places[y*NUM_COLS+x].stoneId = getRandomStone();
+			m_places[y*NUM_COLS+x].spriteId = EMPTY;
 		}
 	}
 }
@@ -243,6 +243,9 @@ u8 PlayGameState::createSprite(u8 stoneId, u8 x, u8 y)
 
 void PlayGameState::destroySprite(u8 spriteId)
 {
+	char msg[32];
+	std::sprintf(msg, "desroy %i !!!", spriteId);
+	LoggingService::getInstance()->logMessage(msg);
 	PA_DeleteSprite(0, spriteId);
 	m_availableSprites.push(spriteId);
 }
@@ -261,18 +264,18 @@ void PlayGameState::animSelectedSprites()
 
 void PlayGameState::showPlayfield()
 {
-	for (u8 i = 0; i < 48; ++i)
+	for (u8 i = 0; i < NUM_PLACES; ++i)
 	{
 		if (m_places[i].stoneId != EMPTY)
 		{
-			m_places[i].spriteId = createSprite(m_places[i].stoneId, i % 8, i / 8);
+			m_places[i].spriteId = createSprite(m_places[i].stoneId, i % NUM_COLS, i / NUM_COLS);
 		}
 	}
 }
 
 void PlayGameState::hidePlayfield()
 {
-	for (u8 i = 0; i < 48; ++i)
+	for (u8 i = 0; i < NUM_PLACES; ++i)
 	{
 		if (m_places[i].spriteId != EMPTY)
 		{
@@ -318,21 +321,22 @@ void PlayGameState::destroySelected()
 {
 	for (u8 i = 0; i < 3; ++i)
 	{
-		if (m_selection[i] != EMPTY_PLACE)
+		Place p = m_selection[i];
+		if (p != EMPTY_PLACE)
 		{
 			// find the place
-			for (u8 ii = 0; ii < 8*6; ++ii)
+			for (u8 ii = 0; ii < NUM_PLACES; ++ii)
 			{
-				if (m_selection[i] == m_places[ii])
+				if (p == m_places[ii])
 				{
-					setSpriteSelected(m_selection[i].spriteId, false);
-					m_availableStones.push_back(m_selection[i].stoneId);
-					destroySprite(m_selection[i].spriteId);
-					m_selection[i] = EMPTY_PLACE;
+					setSpriteSelected(p.spriteId, false);
+					m_availableStones.push_back(p.stoneId);
+					destroySprite(p.spriteId);
 					m_places[ii] = EMPTY_PLACE;
 				}
 			}
 		}
+		m_selection[i] = EMPTY_PLACE;
 	}
 }
 
@@ -355,7 +359,7 @@ u8 PlayGameState::getNumSelected() const
 	
 	for (u8 i = 0; i < 3; ++i)
 	{
-		if (m_selection[i].spriteId != EMPTY)
+		if (m_selection[i] != EMPTY_PLACE)
 		{
 			++rval;
 		}
@@ -396,10 +400,10 @@ bool PlayGameState::checkSet() const
 void PlayGameState::compactPlayfield()
 {
 	// Process each column from bottom to top.
-	for (u8 x = 0; x < 8; ++x)
+	for (u8 x = 0; x < NUM_COLS; ++x)
 	{
 		u8 gap = 0; // y-index of the last gap found.
-		for (u8 yy = 6; yy > 0; --yy)
+		for (u8 yy = NUM_ROWS; yy > 0; --yy)
 		{
 			u8 y = yy-1;
 			if (m_places[y*8+x] == EMPTY_PLACE)
@@ -429,7 +433,7 @@ void PlayGameState::moveSprites()
 	// Move sprites and increment velocity.
 	for (u8 i = 0; i < m_fallingSprites.size();)
 	{
-		u8 targetY = (m_fallingSprites[i].targetPlace / 8) * 32;
+		u8 targetY = (m_fallingSprites[i].targetPlace / NUM_COLS) * 32;
 		u8 currentY = PA_GetSpriteY(0, m_fallingSprites[i].spriteId);
 		currentY += m_fallingSprites[i].velocity;
 		currentY = std::min(targetY, currentY);
@@ -442,7 +446,7 @@ void PlayGameState::moveSprites()
 
 void PlayGameState::addNewStone()
 {
-	u8 x = PA_RandMax(7);
+	u8 x = PA_RandMax(NUM_COLS - 1);
 	if (m_places[x] == EMPTY_PLACE)
 	{
 			m_places[x].stoneId = getRandomStone();
