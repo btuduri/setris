@@ -94,6 +94,7 @@ private:
 	std::vector<FallingSprite> m_fallingSprites;
 	
 	bool m_isSuspending;
+	bool m_gameOver;
 	
 	void initPlayField();
 	
@@ -119,6 +120,8 @@ private:
 	void moveSprites();
 	
 	void addNewStone();
+	
+	void gameOver();
 	
 	
 	u8 getNumSelected() const;
